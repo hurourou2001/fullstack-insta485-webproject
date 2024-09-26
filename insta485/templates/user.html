@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insta485</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .logo-text {
+            display: flex;
+            align-items: center;
+        }
+        .logo-text img {
+            margin-right: 10px;
+        }
+        .logo-text h1 {
+            font-size: 1.5em;
+            font-weight: normal;
+            margin: 0;
+        }
+        .nav-right {
+            flex: 1;
+            text-align: right;
+        }
+        .nav-container a {
+            text-decoration: none;
+            color: black;
+            margin: 0 10px;
+        }
+        h1 {
+            font-size: 2em;
+            font-weight: normal;
+            margin: 20px 0 10px;
+            text-align: center;
+        }
+        .profile-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .profile-info a {
+            font-weight: bold;
+            color: black;
+            text-decoration: none;
+        }
+        .profile-info p {
+            margin: 10px 0;
+        }
+        .profile-stats {
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .profile-stats a {
+            margin-left: 10px;
+            text-decoration: none;
+            color: black;
+        }
+        .profile-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .profile-actions form, .profile-actions a {
+            display: inline-block;
+        }
+        .profile-actions form input[type="submit"] {
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .upload-post-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .upload-post-form input[type="file"] {
+            margin-right: 10px;
+        }
+        .upload-post-form input[type="submit"] {
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .posts-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .posts-container img {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="nav-container">
+        <!-- Logo and Insta485 Text -->
+        <div class="logo-text">
+            <a href="{{ url_for('show_index') }}">
+                <img src="{{ url_for('static', filename='images/ins_logo.png') }}" alt="Insta485 Logo" width="30" height="30">
+            </a>
+            <h1>Insta485</h1>
+        </div>
+        <!-- Explore and Username on the Right -->
+        <div class="nav-right">
+            <a href="{{ url_for('show_explore') }}">Explore</a>
+            <a href="{{ url_for('show_user', user_url_slug=logname) }}">{{ logname }}</a>
+        </div>
+    </div>
+
+    <!-- Profile Info -->
+    <div class="profile-info">
+        <h1>{{ user['username'] }}</h1>
+        {% if user.if_follow == 'None' %}
+            <a href="{{ url_for('edit') }}">Edit profile</a>
+        {% endif %}
+        {% if user.if_follow == 'not_following' %}
+            <div class="profile-actions">
+                <form action="{{ url_for('follow_user') }}?target={{ url_for('show_user', user_url_slug=user['username']) }}" method="post" enctype="multipart/form-data">
+                    <input type="submit" name="follow" value="Follow">
+                    <input type="hidden" name="username" value="{{ user['username'] }}">
+                    <input type="hidden" name="operation" value="follow">
+                </form>
+            </div>
+        {% elif user.if_follow == 'following' %}
+            <div class="profile-actions">
+                <form action="{{ url_for('follow_user') }}?target={{ url_for('show_user', user_url_slug=user['username']) }}" method="post" enctype="multipart/form-data">
+                    <input type="submit" name="unfollow" value="Unfollow">
+                    <input type="hidden" name="username" value="{{ user['username'] }}">
+                    <input type="hidden" name="operation" value="unfollow">
+                </form>
+            </div>
+        {% endif %}
+        {% if user.if_follow == 'None' %}
+            <div class="profile-actions">
+                <form action="{{ url_for('logout') }}" method="post" enctype="multipart/form-data">
+                    <input type="submit" name="logout" value="Logout">
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Profile Stats -->
+    <div class="profile-info profile-stats">
+        {{ user.num_posts }} {% if user.num_posts == 1 %} post {% else %} posts {% endif %} |
+        <a href="{{ url_for('show_followers', user_url_slug=user['username']) }}">
+            {{ user.num_followers }} {% if user.num_followers == 1 %} follower {% else %} followers {% endif %}
+        </a> |
+        <a href="{{ url_for('show_following', user_url_slug=user['username']) }}">
+            {{ user.num_following }} following
+        </a>
+        <p>{{ user.fullname }}</p>
+    </div>
+
+    <!-- Upload New Post Form -->
+    {% if user.if_follow == 'None' %}
+        <div class="upload-post-form">
+            <form action="{{ url_for('update_posts') }}?target={{ url_for('show_user', user_url_slug=user_url_slug) }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <input type="submit" name="create_post" value="Upload New Post">
+                <input type="hidden" name="operation" value="create">
+            </form>
+        </div>
+    {% endif %}
+
+    <!-- User Posts -->
+    <div class="posts-container">
+        {% if user.num_posts == 0 %}
+            <p>No posts yet.</p>
+        {% else %}
+            {% for img in image %}
+                <a href="{{ url_for('show_posts', postid_url_slug=img.postid) }}">
+                    <img src="{{ url_for('uploaded_file', filename=img.img_name) }}" alt="User post image">
+                </a>
+            {% endfor %}
+        {% endif %}
+    </div>
+</body>
+</html>

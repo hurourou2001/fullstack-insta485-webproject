@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insta485</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white; 
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .nav-container a {
+            text-decoration: none;
+            color: black;
+            margin: 0 10px;
+        }
+        .nav-right {
+            flex: 1;
+            text-align: right;
+        }
+        .box {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 20px auto;
+            padding: 15px;
+            width: 400px;
+            background-color: #f9f9f9;
+        }
+        /* Profile Picture Styling */
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        /* Post Image Styling */
+        .post-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .box p {
+            margin: 0;
+            padding: 5px 0;
+        }
+        .box form {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .box form input[type="submit"] {
+            background-color: #3897f0;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .box form input[type="text"] {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .box a {
+            color: #3897f0;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="nav-container">
+        <a href="{{ url_for('show_index') }}">
+            <img src="{{ url_for('static', filename='images/ins_logo.png') }}" alt="Insta Logo" width="30" height="30">
+        </a>
+        <h2>Insta485</h2>
+        <div class="nav-right">
+            <a href="{{ url_for('show_explore') }}">Explore</a>
+            <a href="{{ url_for('show_user', user_url_slug=logname) }}">{{ logname }}</a>
+        </div>
+    </div>
+
+    <!-- Post Loop -->
+    {% for post in posts %}
+    <div class="box">
+        <!-- Post Owner Info -->
+        <a href="{{ url_for('show_user', user_url_slug=post.owner) }}">
+            <img class="profile-pic" src="{{ url_for('uploaded_file', filename=post.profile_pic) }}" alt="Profile picture of {{ post.owner }}">
+            <strong>{{ post.owner }}</strong>
+        </a>
+
+        <!-- Post Time -->
+        <div class="nav-right">
+            <a href="{{ url_for('show_posts', postid_url_slug=post.postid) }}">
+                <p>{{ post.time_since }}</p>
+            </a>
+        </div>
+
+        <!-- Post Image -->
+        <img class="post-image" src="{{ url_for('uploaded_file', filename=post.filename) }}" alt="Post image">
+
+        <!-- Post Likes -->
+        <div>{{ post.number_likes }} {% if post.number_likes == 1 %} like {% else %} likes {% endif %}</div>
+
+        <!-- Post Comments -->
+        {% for comment in post.comments %}
+        <div>
+            <p>
+                <a href="{{ url_for('show_user', user_url_slug=comment.comment_owner) }}">{{ comment.comment_owner }}</a>
+                {{ comment.text }}
+            </p>
+        </div>
+        {% endfor %}
+
+        <!-- Like/Unlike Button -->
+        {% if post.like_or_unlike == 'like' %}
+        <form action="{{ url_for('update_likes') }}?target={{ url_for('show_index') }}" method="post">
+            <input type="hidden" name="operation" value="like">
+            <input type="hidden" name="postid" value="{{ post.postid }}">
+            <input type="submit" name="like" value="like">
+        </form>
+        {% else %}
+        <form action="{{ url_for('update_likes') }}?target={{ url_for('show_index') }}" method="post">
+            <input type="hidden" name="operation" value="unlike">
+            <input type="hidden" name="postid" value="{{ post.postid }}">
+            <input type="submit" name="unlike" value="unlike">
+        </form>
+        {% endif %}
+
+        <!-- Comment Form -->
+        <form action="{{ url_for('update_comments') }}?target={{ url_for('show_index') }}" method="post">
+            <input type="hidden" name="operation" value="create">
+            <input type="hidden" name="postid" value="{{ post.postid }}">
+            <input type="text" name="text" placeholder="Add a comment..." required>
+            <input type="submit" name="comment" value="comment">
+        </form>
+    </div>
+    {% endfor %}
+</body>
+</html>

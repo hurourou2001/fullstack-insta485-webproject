@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Insta485</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+        }
+        .logo-text {
+            display: flex;
+            align-items: center;
+        }
+        .logo-text img {
+            margin-right: 10px;
+        }
+        .logo-text h1 {
+            font-size: 1.5em;
+            font-weight: normal;
+            margin: 0;
+        }
+        header .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        header a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+        h2 {
+            text-align: center;
+            font-size: 1.8em;
+            margin-top: 20px;
+        }
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 400px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .user-item img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .user-item a {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: black;
+            text-decoration: none;
+        }
+        .user-item form {
+            margin-left: auto;
+        }
+        .user-item form input[type="submit"] {
+            background-color: #3897f0;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo-text">
+            <a href="{{ url_for('show_index') }}">
+                <img src="{{ url_for('static', filename='images/ins_logo.png') }}" alt="Insta Logo" width="30" height="30">
+            </a>
+            <h1>Insta485</h1>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('show_explore') }}">Explore</a>
+            <a href="{{ url_for('show_user', user_url_slug=logname) }}">{{ logname }}</a>
+        </div>
+    </header>
+
+    <!-- Title -->
+    <h2>Discover People</h2>
+
+    <!-- User List -->
+    <div class="user-list">
+        {% for user in users %}
+        <div class="user-item">
+            <!-- User Profile Picture -->
+            <img src="{{ url_for('uploaded_file', filename=user.profile) }}" alt="{{ user.username }} icon">
+            
+            <!-- Username -->
+            <a href="{{ url_for('show_user', user_url_slug=user.username) }}">{{ user.username }}</a>
+
+            <!-- Follow Button -->
+            <form action="{{ url_for('follow_user') }}?target={{ url_for('show_explore') }}" method="post" enctype="multipart/form-data">
+                <input type="submit" name="follow" value="Follow">
+                <input type="hidden" name="username" value="{{ user.username }}">
+                <input type="hidden" name="operation" value="follow">
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Insta485</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        a {
+            text-decoration: none;
+            color: #3897f0;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Navigation Bar */
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .nav-right {
+            text-align: right;
+        }
+        .nav-container a {
+            color: black;
+            margin-left: 20px;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.8em;
+            color: #333;
+        }
+
+        /* Follower Box */
+        .box {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            padding: 20px;
+            width: 300px;
+            max-width: 90%;
+            display: flex;
+            align-items: center;
+        }
+        .box img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-right: 20px;
+        }
+        .box a {
+            font-weight: bold;
+            color: #333;
+            flex: 1;
+        }
+        .box .nav-right {
+            display: flex;
+            align-items: center;
+        }
+        .box .nav-right form input[type="submit"] {
+            background-color: #3897f0;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .box .nav-right form input[type="submit"]:hover {
+            background-color: #3077c9;
+        }
+        .box .nav-right span {
+            margin-right: 10px;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <div class="nav-container">
+        <a href="{{ url_for('show_index') }}">
+            <img src="{{ url_for('static', filename='images/ins_logo.png') }}" alt="Insta Logo" width="30" height="30">
+        </a>
+            <div class="nav-right">
+                <a href="{{ url_for('show_explore') }}">Explore</a>
+                <a href="{{ url_for('show_user', user_url_slug=logname) }}">{{ logname }}</a>
+            </div>
+    </div>
+
+    <!-- Followers Section -->
+    <div>
+        <h2>Followers</h2>
+    </div>
+
+    <!-- Follower List -->
+    {% for follower in followers %}
+        <div class="box">
+            <!-- Profile picture -->
+            <img src="{{ url_for('uploaded_file', filename=follower.icon) }}" alt="{{ follower.username }}'s profile picture">
+            
+            <!-- Follower's username -->
+            <a href="{{ url_for('show_user', user_url_slug=follower.username) }}">{{ follower.username }}</a>
+            
+            <!-- Relationship and follow/unfollow button -->
+            <div class="nav-right">
+                {% if follower.relationship == 'following' %}
+                    <span>Following</span>
+                    <form action="{{ url_for('follow_user') }}?target={{ url_for('show_followers', user_url_slug=user_url_slug) }}" method="post" enctype="multipart/form-data">
+                        <input type="submit" name="unfollow" value="Unfollow"/>
+                        <input type="hidden" name="username" value="{{ follower.username }}"/>
+                        <input type="hidden" name="operation" value="unfollow"/>
+                    </form>
+                {% elif follower.relationship == 'not_following' %}
+                    <span>Not following</span>
+                    <form action="{{ url_for('follow_user') }}?target={{ url_for('show_followers', user_url_slug=user_url_slug) }}" method="post" enctype="multipart/form-data">
+                        <input type="submit" name="follow" value="Follow"/>
+                        <input type="hidden" name="username" value="{{ follower.username }}"/>
+                        <input type="hidden" name="operation" value="follow"/>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</body>
+</html>

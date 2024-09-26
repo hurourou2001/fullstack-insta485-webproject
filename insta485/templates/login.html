@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Insta485</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            width: 350px;
+            padding: 40px;
+            text-align: center;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        header img {
+            width: 50px;
+            height: 50px;
+        }
+        header a {
+            text-decoration: none;
+            color: #00376b;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #3897f0;
+            border: none;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .signup {
+            margin-top: 20px;
+        }
+        .signup a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #00376b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="{{ url_for('static', filename='images/ins_logo.png') }}" alt="Insta Logo">
+            <a href="{{url_for('login')}}">login</a>
+        </header>
+        <main>
+            <form action="{{ url_for('accounts') }}?target={{ url_for('show_index') }}" method="post">
+                <input type="text" name="username" placeholder="username" required/>
+                <input type="password" name="password" placeholder="password" required/>
+                <input type="submit" value="login"/>
+                <input type="hidden" name="operation" value="login"/>
+            </form>
+            <div class="signup">
+                <p>Don't have an account? <a href="{{ url_for('create') }}">Sign up</a></p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

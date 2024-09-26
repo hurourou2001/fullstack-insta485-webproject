@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Insta485 | Account Settings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fafafa;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        header img {
+            height: 30px;
+        }
+        header a {
+            color: #262626;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        main img {
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        form input[type="file"], 
+        form input[type="text"], 
+        form input[type="submit"] {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form input[type="submit"] {
+            background-color: #3897f0;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        form input[type="submit"]:hover {
+            background-color: #3077c9;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3897f0;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('show_index')}}">
+            <img src="{{ url_for('static', filename='images/ins_logo.png') }}" alt="Insta485 Logo">
+        </a>
+        <h2>Insta485</h2>
+        <nav>
+            <a href="{{url_for('show_explore')}}">Explore</a>
+            <a href="{{url_for('show_user', user_url_slug=logname)}}">{{ logname }}</a>
+        </nav>
+    </header>
+
+    <main>
+        <img src="{{ url_for('uploaded_file', filename=users.profile) }}" alt="User Photo" width="100" height="100">
+        <h2>{{ logname }}</h2>
+
+        <form action="{{ url_for('accounts') }}?target={{ url_for('edit') }}" method="post" enctype="multipart/form-data">
+            <label for="file">Change Profile Photo</label>
+            <input type="file" id="file" name="file" accept="image/*">
+            
+            <label for="fullname">Name</label>
+            <input type="text" id="fullname" name="fullname" value="{{ users.fullname }}" required>
+            
+            <label for="email">Email</label>
+            <input type="text" id="email" name="email" value="{{ users.email }}" required>
+            
+            <input type="submit" name="update" value="Submit">
+            <input type="hidden" name="operation" value="edit_account">
+        </form>
+
+        <a href="{{ url_for('password') }}">Change Password</a>
+        <a href="{{ url_for('delete') }}">Delete Account</a>
+    </main>
+</body>
+</html>
