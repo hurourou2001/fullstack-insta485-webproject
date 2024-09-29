@@ -16,6 +16,9 @@ if [ ! -f "$DB_FILE" ]; then
   exit 1
 fi
 
+#added for p3: build the front end
+npx webpack --watch
+
 flask --app insta485 --debug run --host 0.0.0.0 --port 8000
 
 
