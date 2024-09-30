@@ -113,8 +113,6 @@ def get_posts():
     return flask.jsonify(response), 200
 
 
-
-
 @insta485.app.route('/api/v1/posts/<int:postid_url_slug>/')
 def get_post(postid_url_slug):
     """Return post on postid.
