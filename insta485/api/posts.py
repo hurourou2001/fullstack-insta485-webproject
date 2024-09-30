@@ -36,14 +36,9 @@ def is_authenticated(connection):
 
     # 2. Session-based Authentication
     if 'username' in flask.session:
-        username = flask.session['username']
-        # password = flask.request.form['password']
         return True
-        print(password)
-    else:
-        return False
-        
-    return verify_auth(connection, username, password)
+
+    return False
 
     
 
