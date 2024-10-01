@@ -14,25 +14,34 @@ def verify_auth(connection, username, password):
     result = connection.execute(query, (username,)).fetchone()
     if result is None:
         return False
+
+    alg, salt, hash = result["password"].split('$')
     
-    if result["password"] == password:
+    if result["password"] == hash_password(password, salt):
         return True
     return False
 
+# 
+
 def is_authenticated(connection):
     auth = flask.request.authorization
-
+    #print(auth.password)
     # 1. HTTP Basic Auth
+    username = ""
+    password = ""
     if auth:
-        username = auth.username
-        password = auth.password
+        username = auth['username']
+        password = auth['password']
         return verify_auth(connection, username, password)
 
     # 2. Session-based Authentication
     if 'username' in flask.session:
-        return True
-
-    return False
+        username = flask.session['username']
+        password = flask.session.get('password')
+        if password is None:
+            return False
+        
+    return verify_auth(connection, username, password)
 
     
 
@@ -114,7 +123,7 @@ def get_posts():
 
 
 @insta485.app.route('/api/v1/posts/<int:postid_url_slug>/')
-def get_post(postid_url_slug):
+def get_post_id(postid_url_slug): 
     """Return post on postid.
 
     Example:
@@ -129,47 +138,99 @@ def get_post(postid_url_slug):
       "url": "/api/v1/posts/1/"
     }
     """
-    context = {
-        "created": "2017-09-28 04:33:28",
-        "imgUrl": "/uploads/122a7d27ca1d7420a1072f695d9290fad4501a41.jpg",
-        "owner": "awdeorio",
-        "ownerImgUrl": "/uploads/e1a7c5c32973862ee15173b0259e3efdb6a391af.jpg",
-        "ownerShowUrl": "/users/awdeorio/",
-        "postShowUrl": f"/posts/{postid_url_slug}/",
-        "postid": postid_url_slug,
-        "url": flask.request.path,
+    connection = insta485.model.get_db()
+
+    if not is_authenticated(connection):
+        return flask.jsonify({"message": "Unauthorized", "status_code": 403}),403
+    
+    if 'username' in flask.session:
+        username = flask.session['username']
+    else:
+        auth = flask.request.authorization
+        username = auth.username
+    
+    postid = postid_url_slug
+
+    queryPosts = connection.execute("""
+        SELECT created, filename, owner                        
+        FROM posts
+        WHERE postid = ?
+        """
+    ,(postid,)).fetchone()
+
+    if queryPosts is None:
+        return flask.jsonify({"message":"Not    Found","Status_code":404}),404
+
+    queryComments = connection.execute("""
+          SELECT commentid, owner, text, created
+          FROM comments
+          WHERE postid = ?
+        """
+        , (postid,)).fetchall()
+    
+    queryLike = connection.execute("""
+        SELECT likeid
+        FROM likes
+        WHERE postid = ? AND owner = ?
+        """, (postid, username)).fetchone()
+    
+    queryLikeNum = connection.execute("""
+        SELECT likeid
+        FROM likes
+        WHERE postid = ?
+        """, (postid,)).fetchall()
+    
+    if queryLike is not None:
+        Likes = {
+            "lognameLikesThis": True,
+            "numLikes": len(queryLikeNum),
+            "url":f"/api/v1/likes/{queryLike['likeid']}/"
+        }
+    else:
+        Likes = {
+            "lognameLikesThis": False,
+             "numLikes": len(queryLikeNum),
+            "url":"null"
+        }
+    
+    queryUser = connection.execute(
+        """
+        SELECT filename
+        FROM users
+        WHERE username = ?
+        """,(queryPosts['owner'],)).fetchone()
+    
+    response = {
+        "comments" :[
+            {
+                "commentid": comment['commentid'],
+                "lognameOwnsThis":True if username == comment['owner'] else False,
+                "owner":comment['owner'],
+                "ownerShowUrl":f"/users/{comment['owner']}/",
+                "text":comment['text'],
+            "url":f"/api/v1/comments/{comment['commentid']}/"
+            }
+            for comment in queryComments 
+        ],
+        "comments_url": f"/api/v1/comments/?postid={postid}",
+        "created": queryPosts['created'],
+        "imgUrl": f"/uploads/{queryPosts['filename']}",
+        "likes" : Likes,
+        "owner": queryPosts['owner'],
+        "ownerImgUrl": f"/uploads/{queryUser['filename']}",
+        "ownerShowUrl": f"/users/{queryPosts['owner']}/",
+        "postShowUrl": f"/posts/{postid}/",
+        "postid":postid,
+        "url": f"/api/v1/posts/{postid}/"
     }
-    return flask.jsonify(**context)
+    
+    return flask.jsonify(response),200
 
-"""REST API for posts."""
-import flask
-import insta485
+    
+                        
 
 
-@insta485.app.route('/api/v1/posts/<int:postid_url_slug>/')
-def get_post(postid_url_slug):
-    """Return post on postid.
+    
+       
+    
 
-    Example:
-    {
-      "created": "2017-09-28 04:33:28",
-      "imgUrl": "/uploads/122a7d27ca1d7420a1072f695d9290fad4501a41.jpg",
-      "owner": "awdeorio",
-      "ownerImgUrl": "/uploads/e1a7c5c32973862ee15173b0259e3efdb6a391af.jpg",
-      "ownerShowUrl": "/users/awdeorio/",
-      "postShowUrl": "/posts/1/",
-      "postid": 1,
-      "url": "/api/v1/posts/1/"
-    }
-    """
-    context = {
-        "created": "2017-09-28 04:33:28",
-        "imgUrl": "/uploads/122a7d27ca1d7420a1072f695d9290fad4501a41.jpg",
-        "owner": "awdeorio",
-        "ownerImgUrl": "/uploads/e1a7c5c32973862ee15173b0259e3efdb6a391af.jpg",
-        "ownerShowUrl": "/users/awdeorio/",
-        "postShowUrl": f"/posts/{postid_url_slug}/",
-        "postid": postid_url_slug,
-        "url": flask.request.path,
-    }
-    return flask.jsonify(**context)
