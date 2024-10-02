@@ -15,6 +15,9 @@ def show_index():
     # Connect to database
     connection = insta485.model.get_db()
 
+    if 'username' not in flask.session:
+        return flask.redirect(flask.url_for('login'))
+
     # Query database
     logname = "awdeorio"
     cur = connection.execute(

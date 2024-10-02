@@ -37,9 +37,11 @@ def is_authenticated(connection):
     # 2. Session-based Authentication
     if 'username' in flask.session:
         username = flask.session['username']
-        password = flask.session.get('password')
-        if password is None:
-            return False
+        # password = flask.request.form['password']
+        return True
+        print(password)
+    else:
+        return False
         
     return verify_auth(connection, username, password)
 
@@ -63,6 +65,9 @@ def get_posts():
       #  return flask.jsonify({"message": "Forbidden", "status_code": 403}), 403
 
     size = flask.request.args.get('size', default = 10, type=int)
+
+    if size < 0:
+        return flask.jsonify({"message":"Bad Request", "status_code": 400}),400
     page = flask.request.args.get('page', default = 0, type=int)
  
 
