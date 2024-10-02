@@ -226,7 +226,106 @@ def get_post_id(postid_url_slug):
     
     return flask.jsonify(response),200
 
+@insta485.app.route("/api/v1/comments/", methods=["POST"])
+def addComment():
+    """
+    Update a post with a comment.
+    """
+    connection = insta485.model.get_db()
+
+    if not is_authenticated(connection):
+        return flask.jsonify({"message": "Unauthorized", "status_code": 403}),403
     
+    if 'username' in flask.session:
+        username = flask.session['username']
+    else:
+        auth = flask.request.authorization
+        username = auth.username
+
+    text = flask.request.json.get("text")
+    postid = flask.request.args.get('postid')
+    queryPosts = connection.execute("""
+        SELECT * FROM posts WHERE postid = ?""",    
+        (postid,)).fetchone()
+    
+    if not queryPosts:
+        return flask.jsonify({"message":"Not Found", "Status Code": 404}),404                      
+                                    
+    connection.execute(
+        """
+        INSERT INTO comments(postid, owner, text)
+        VALUES(?,?,?)
+        """, (postid, username, text))
+    
+    newComment = connection.execute(
+        """
+        SELECT last_insert_rowid() AS commentid
+        """
+    ).fetchone()['commentid']
+
+    
+
+    response = {
+         "commentid": newComment,
+        "lognameOwnsThis": True,
+         "owner": username,
+        "ownerShowUrl": f"/users/{username}/",
+        "text": text,
+        "url": f"/api/v1/comments/{newComment}/"
+    }
+
+    return flask.jsonify(response),201
+
+@insta485.app.route("/api/v1/comments/<commentid>/", methods = ["DELETE"])
+def deleteComment(commentid):
+    connection = insta485.model.get_db()
+
+    if not is_authenticated(connection):
+        return flask.jsonify({"message": "Unauthorized", "status_code": 
+                              403}),403
+    
+    if 'username' in flask.session:
+        username = flask.session['username']
+    else:
+        auth = flask.request.authorization
+        username = auth.username
+    
+    if not commentid:
+        return flask.jsonify({"message":"Not Found", "Status Code": 
+                              404}),404
+    
+    comment = connection.execute("""
+        SELECT * FROM comments WHERE commentid = ?""",
+        (commentid,)).fetchone()
+    
+    if not comment:
+        return flask.jsonify({"message":"Not Found", "Status Code": 404}),404
+   
+    commentOwner = connection.execute("""
+    SELECT owner FROM comments WHERE commentid = ?""",
+    (commentid,)).fetchone()['owner']
+    
+    if username != commentOwner:
+        return flask.jsonify({"message": "Unauthorized", "status_code": 
+                              403}),403
+
+    connection.execute(
+        """
+        DELETE FROM comments WHERE commentid = ?
+        """, (commentid,))
+    
+    connection.commit()
+
+    return '', 204
+
+    
+
+
+
+
+    
+
+
                         
 
 
