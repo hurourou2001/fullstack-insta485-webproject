@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import Comment from "./comments";
+import Comment from "./comment";
 
 // The parameter of this function is an object with a string called url inside it.
 // url is a prop for the Post component.
@@ -89,10 +89,10 @@ export default function Post({ posturl }) {
         if (response.ok) {
           setLikes((prevLikes) => ({
             ...prevLikes,
-            lognameLikeThis: !prevLikes.lognameLikesThis,
-            numLikes: prevLikes.lognameLikeThis
-              ? prevLikes.numLikes - 1
-              : prevLikes.numLikes + 1,
+            lognameLikesThis: !prevLikes.lognameLikesThis,
+            numLikes: !prevLikes.lognameLikesThis
+              ? prevLikes.numLikes + 1
+              : prevLikes.numLikes - 1,
           }))
         } else {
           console.error("Failed to update like status")
@@ -106,7 +106,7 @@ export default function Post({ posturl }) {
   function handleDoubleClickLike() {
     if (!likes.lognameLikesThis) {
       fetch(likes.url, {
-        method: "Post",
+        method: "POST",
         credentials: "same-origin",
       })
         .then((response) => {
@@ -175,30 +175,26 @@ export default function Post({ posturl }) {
       />
       {/* Like Section */}
       <div>
-        <button onClick={handleLike}>
+        <button data-testid='like-unlike-button' onClick={handleLike}>
           {likes.lognameLikesThis? "Unlike" : "Like"} ({likes.numLikes})
         </button>
       </div>
 
-      <div className="comments">
-        {comments.map((comment) => (
-          <div key={comment.commentid} className="comment">
-            <span data-testid="comment-text">{comment.text}</span>
-            
-            {comment.lognameOwnsThis && (
-              <button
-                data-testid="delete-comment-button"
-                onClck={() => handleClick(comment.commentid)}
-              >
-                Delete
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+      {comments.map((x) =>
+          <Comment
+          key={x.commentid}
+          commentid={x.commentid}
+          lognameOwnsThis={x.lognameOwnsThis}
+          owner={x.owner}
+          ownerShowUrl={x.ownerShowUrl}
+          text={x.text}
+          url={x.url}
+          handleClick={handleClick}
+        />
+      )}
 
       {/* Comment Form */}
-      <form data-testid="comment-form" onSubmit={handleAddComment}>
+      <form data-testid='comment-form' onSubmit={handleAddComment}>
         <input
           type="text"
           value={newCommentText}

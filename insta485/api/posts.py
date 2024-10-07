@@ -3,6 +3,7 @@ import flask
 import insta485
 from insta485.views.accounts import hash_password
 import uuid
+import logging
 
 
 def verify_auth(connection, username, password):
@@ -46,6 +47,7 @@ def is_authenticated(connection):
 
 @insta485.app.route('/api/v1/posts/')
 def get_posts():
+    logging.info("Received a GET request for posts")
     connection = insta485.model.get_db()
 
     if not is_authenticated(connection):
@@ -161,7 +163,7 @@ def get_post_id(postid_url_slug):
     ,(postid,)).fetchone()
 
     if queryPosts is None:
-        return flask.jsonify({"message":"Not    Found","Status_code":404}),404
+        return flask.jsonify({"message":"Not Found","Status_code":404}),404
 
     queryComments = connection.execute("""
           SELECT commentid, owner, text, created
