@@ -17,7 +17,7 @@ def verify_auth(connection, username, password):
         return False
 
     alg, salt, hash = result["password"].split('$')
-    
+
     if result["password"] == hash_password(password, salt):
         return True
     return False
@@ -45,13 +45,13 @@ def is_authenticated(connection):
 
     
 
-@insta485.app.route('/api/v1/posts/')
+@insta485.app.route("/api/v1/posts/")
 def get_posts():
     logging.info("Received a GET request for posts")
     connection = insta485.model.get_db()
 
     if not is_authenticated(connection):
-        return flask.jsonify({"message": "Unauthorized", "status_code": 403}),403
+        return flask.jsonify({"message": "Forbidden", "status_code": 403}),403
     
     if 'username' in flask.session:
         username = flask.session['username']
@@ -70,12 +70,12 @@ def get_posts():
     page = flask.request.args.get('page', default = 0, type=int)
  
 
-    most_recent_post_id = """
-        SELECT postid
-        FROM posts
-        ORDER by postid DESC
-        LIMIT 1
-    """
+    # most_recent_post_id = """
+    #     SELECT postid
+    #     FROM posts
+    #     ORDER by postid DESC
+    #     LIMIT 1
+    # """
     postid_lte = flask.request.args.get('postid_lte')
     if postid_lte is None:
         most_recent_post_id = """
@@ -126,7 +126,7 @@ def get_posts():
     return flask.jsonify(response), 200
 
 
-@insta485.app.route('/api/v1/posts/<int:postid_url_slug>/')
+@insta485.app.route("/api/v1/posts/<int:postid_url_slug>/")
 def get_post_id(postid_url_slug): 
     """Return post on postid.
 
@@ -145,7 +145,7 @@ def get_post_id(postid_url_slug):
     connection = insta485.model.get_db()
 
     if not is_authenticated(connection):
-        return flask.jsonify({"message": "Unauthorized", "status_code": 403}),403
+        return flask.jsonify({"message": "Forbidden", "status_code": 403}),403
     
     if 'username' in flask.session:
         username = flask.session['username']

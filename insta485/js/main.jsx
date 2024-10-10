@@ -16,8 +16,8 @@ root.render(
 );
 
 export default function Main() {
-    const { items: posts, fetchItems: fetchPosts, hasMore, loading} = useInfiniteScroll("/api/v1/posts/");
-
+    const { items: posts, fetchItems: fetchPosts, hasMore, loading} = useInfiniteScroll('/api/v1/posts/');
+    console.log(posts)
     return (
         <div className="main-page">
             {loading && posts.length === 0 && (
@@ -34,7 +34,7 @@ export default function Main() {
                 endMessage={<p>No more posts to show</p>}
             >
                 {posts.map((post) => (
-                    <Post key={post.postid} posturl={`/api/v1/posts/${post.postid}/`} />
+                    <Post key={post.postid} post={post} />
                 ))}
             </InfiniteScroll>
         </div>

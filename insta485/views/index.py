@@ -19,7 +19,7 @@ def show_index():
         return flask.redirect(flask.url_for('login'))
 
     # Query database
-    logname = "awdeorio"
+    logname = flask.session['username']
     cur = connection.execute(
         "SELECT username, fullname "
         "FROM users "
