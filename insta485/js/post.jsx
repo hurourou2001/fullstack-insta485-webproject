@@ -7,7 +7,6 @@ import Comment from "./comment";
 export default function Post({ post }) {
   /* Display image and post owner of a single post */
   // const [post, setPost] = useState(null);
-  const [newCommentText, setNewCommentText] = useState(""); // State for handling new comment
 
   // useEffect(() => {
   //   fetch(posturl, { credentials: "same-origin" })
@@ -20,20 +19,38 @@ export default function Post({ post }) {
     return <div>Loading...</div>; // Display a loading message until the post is fetched
   }
 
-  const {
-    comments,
-    comments_url,
-    created,
-    imgUrl,
-    likes,
-    owner,
-    ownerImgUrl,
-    ownerShowUrl,
-    postShowUrl,
-    postid,
-    url,
-  } = post;
-  
+  const [imgUrl, setImgUrl] = useState("");
+  const [owner, setOwner] = useState("");
+  const [comments, setComments] = useState([]);
+  const [comments_url, setcomments_url] = useState("");
+  const [created, setcreated] = useState("");
+  const[likes, setLikes] = useState({
+    lognameLikesThis: false,  
+    numLikes: 0, 
+    url: ""
+    });
+  const [ownerImgUrl, setownerImgUrl] = useState("");
+  const [postShowUrl, setpostShowUrl] = useState("");
+  const [postid, setpostid] = useState(0);
+  const [url, seturl] = useState("");
+  const [ownerShowUrl, setOwnerShowUrl] = useState(""); 
+  const [newCommentText, setNewCommentText] = useState("");
+
+  useEffect(() => {
+  setImgUrl(post.imgUrl);
+  setOwner(post.owner);
+  setcomments_url(post.comments_url);
+  setcreated(post.created);
+  setLikes(post.likes);
+  setownerImgUrl(post.ownerImgUrl);
+  setpostShowUrl(post.postShowUrl);
+  setpostid(post.postid);
+  seturl(post.url);
+  setComments(post.comments);
+  setOwnerShowUrl(post.ownerShowUrl);
+}, [post]);
+
+
   // const [urls, setUrls] = useState([]);
 
   // useEffect(() => {
@@ -230,6 +247,7 @@ export default function Post({ post }) {
         console.error("Error adding comments:", error);
       });
   };
+
   return (
     <div className="post">
        <a href = {ownerShowUrl}>
