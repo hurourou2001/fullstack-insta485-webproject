@@ -6,7 +6,8 @@ export default function Comment({ commentid, lognameOwnsThis, owner, ownerShowUr
         <div className="comment">
             <a href={ownerShowUrl}>
                 {owner}
-            </a> {text}
+            </a> 
+            <span data-testid ="comment-text"> {text} </span>
             {lognameOwnsThis && (
                 <button 
                 data-testid="delete-comment-button"

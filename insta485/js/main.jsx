@@ -10,9 +10,7 @@ const root = createRoot(document.getElementById("reactEntry"));
 // This method is only called once
 // Insert the post component into the DOM
 root.render(
-  <StrictMode>
     <Main />
-  </StrictMode>
 );
 
 export default function Main() {
@@ -32,6 +30,7 @@ export default function Main() {
                 hasMore={hasMore}
                 loader={<h4>Loading more posts...</h4>}
                 endMessage={<p>No more posts to show</p>}
+                
             >
                 {posts.map((post) => (
                     <Post key={post.postid} posturl={post.url} />
