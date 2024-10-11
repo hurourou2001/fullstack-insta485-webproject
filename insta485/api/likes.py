@@ -28,6 +28,7 @@ def create_like():
     """
     cur = connection.execute(check_exist_like, (postid, username))
     rst = cur.fetchone()
+    print('aaaaaa')
     if rst is not None:
         return flask.jsonify({"likeid": rst["likeid"],
                               "url": f"{url}{rst['likeid']}/"}), 200
@@ -38,7 +39,9 @@ def create_like():
     """
     cur = connection.execute(add_like, (username, postid))
     likeid = cur.lastrowid
+    print(likeid)
 
+    print('bbbbbb')
     return flask.jsonify({
         "likeid": likeid,
         "url": f"{url}{likeid}/"

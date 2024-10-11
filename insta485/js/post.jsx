@@ -169,7 +169,6 @@ export default function Post({ post }) {
 
   function handleLike() {
     const method = likes.lognameLikesThis ? "DELETE" : "POST";
-    console.log(likes.url);
     const likeUrl = method === "DELETE" ? likes.url : `/api/v1/likes/?postid=${postid}`; // Fallback for POST if `likes.url` is null
   
     // If it's a POST (like action), we need to provide postid to the backend
@@ -183,7 +182,7 @@ export default function Post({ post }) {
       requestOptions.headers = {
         "Content-Type": "application/json",
       };
-      requestOptions.body = JSON.stringify({ postid: postid }); // Assuming `postid` is available in scope
+       // Assuming `postid` is available in scope
     }
 
     console.log(likeUrl);
@@ -191,7 +190,9 @@ export default function Post({ post }) {
     fetch(likeUrl, requestOptions)
       .then((response) => {
         if (response.ok) {
-          if (method === "POST" && response.likeid) {
+          if (method === "POST") {
+            //console.log(prevLikes);
+            // console.log(response.json());
             setLikes((prevLikes) => ({
               ...prevLikes,
               lognameLikesThis: true,
