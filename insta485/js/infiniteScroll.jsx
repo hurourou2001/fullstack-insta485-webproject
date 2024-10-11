@@ -6,8 +6,12 @@ export const useInfiniteScroll = (initialUrl) => {
     const [nextUrl, setNextUrl] = useState(initialUrl);
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [xx, setxx] = useState(true);
 
     const fetchPostDetail = async (url) => {
+        if (!xx){
+            return;
+        }
         try {
             const response = await fetch(url,{
                 method: 'GET',
@@ -24,32 +28,56 @@ export const useInfiniteScroll = (initialUrl) => {
 
     const fetchItems = async () => {
         if (!nextUrl || loading) return;
+        if (!xx){
+            return;
+        }
         
         setLoading(true);
         console.log(nextUrl)
-        try {
-            const response = await fetch(nextUrl, {
-                method: 'GET',
-                credentials: 'same-origin',
-            });
-            const posts = await response.json();
+        // try {
+        //     const response = await fetch(nextUrl, {
+        //         method: 'GET',
+        //         credentials: 'same-origin',
+        //     });
+        //     const posts = await response.json();
             
-            // Fetch the details for each post in parallel using Promise.all
-            const postDetails = await Promise.all(
-                posts.results.map((post) => fetchPostDetail(post.url))
-            );
+        //     // Fetch the details for each post in parallel using Promise.all
+        //     const postDetails = await Promise.all(
+        //         posts.results.map((post) => fetchPostDetail(post.url))
+        //     );
             
-            // Filter out any null results (failed fetches)
-            const validPosts = postDetails.filter((post) => post !== null);
-            console.log(validPosts)
-            setItems((prevItems) => [...prevItems, ...validPosts]);
-            setNextUrl(posts.next || null);
-            setHasMore(!!posts.next); //if there is no next URL, stop loading more
+        //     // Filter out any null results (failed fetches)
+        //     const validPosts = postDetails.filter((post) => post !== null);
+        //     console.log(validPosts)
+        //     // setItems((prevItems) => [...prevItems, ...validPosts]);
+        //     setItems([...items], [...data.results])
+        //     setNextUrl(posts.next || null);
+        //     setHasMore(!!posts.next); //if there is no next URL, stop loading more
+        //     setLoading(false);
+        //     setxx(false);
+        // }  catch(error) {
+        //     console.error('Error fetching items: ', error);
+        //     setLoading(false);
+        // }
+        fetch(nextUrl, {  method: 'GET',
+            credentials: 'same-origin' })
+        .then((response) => {
+            if (!response.ok) throw Error(response.statusText);
+            return response.json();
+        })
+        .then((data) => {
+            // If ignoreStaleRequest was set to true, we want to ignore the results of the
+            // the request. Otherwise, update the state to trigger a new render.
+            console.log(data.results);
+            // const postDetails = data.results.map((post) => fetchPostDetail(post.url));
+            setItems([...items, ...data.results]);
+            console.log(items);
+            setNextUrl(data.next);
+            setHasMore(!!data.next); //if there is no next URL, stop loading more
             setLoading(false);
-        }  catch(error) {
-            console.error('Error fetching items: ', error);
-            setLoading(false);
-        }
+            setxx(false);
+        })
+        .catch((error) => console.log(error));
     };
 
     useEffect(() => {
