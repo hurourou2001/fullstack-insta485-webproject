@@ -191,14 +191,16 @@ export default function Post({ post }) {
       .then((response) => {
         if (response.ok) {
           if (method === "POST") {
+            response = response.json();
             //console.log(prevLikes);
-            // console.log(response.json());
+            console.log(response.json());
             setLikes((prevLikes) => ({
               ...prevLikes,
               lognameLikesThis: true,
               numLikes: prevLikes.numLikes + 1,
               url: `/api/v1/likes/${response.likeid}/`,
             }));
+
           } else if (method === "DELETE") {
             setLikes((prevLikes) => ({
               ...prevLikes,
