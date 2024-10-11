@@ -193,7 +193,7 @@ def get_post_id(postid_url_slug):
     else:
         Likes = {
             "lognameLikesThis": False,
-             "numLikes": len(queryLikeNum),
+            "numLikes": len(queryLikeNum),
             "url":None
         }
     

@@ -8,14 +8,16 @@ def create_like():
     if not insta485.api.posts.is_authenticated(connection):
         return flask.jsonify({"message": "Unauthorized", "status_code": 403}),403
     
-    postid = flask.request.args.get('postid', type=int)
+    #postid = flask.request.args.get('postid', type=int)
     url = flask.request.path
     username = ""
     if "username" in flask.session:
         username = flask.session["username"]
     else:
         username = flask.request.authorization.username
-    
+    postid = flask.request.args.get('postid', type=int)
+    # if postid is None:
+    #     postid = flask.request.json.get('postid', type=int)
     if postid is None:
         return flask.jsonify({"message": "no postid", "status_code": 400}), 400
     

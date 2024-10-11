@@ -37,18 +37,18 @@ export default function Post({ post }) {
   const [newCommentText, setNewCommentText] = useState("");
 
   useEffect(() => {
-  setImgUrl(post.imgUrl);
-  setOwner(post.owner);
-  setcomments_url(post.comments_url);
-  setcreated(post.created);
-  setLikes(post.likes);
-  setownerImgUrl(post.ownerImgUrl);
-  setpostShowUrl(post.postShowUrl);
-  setpostid(post.postid);
-  seturl(post.url);
-  setComments(post.comments);
-  setOwnerShowUrl(post.ownerShowUrl);
-}, [post]);
+    setImgUrl(post.imgUrl);
+    setOwner(post.owner);
+    setcomments_url(post.comments_url);
+    setcreated(post.created);
+    setLikes(post.likes);
+    setownerImgUrl(post.ownerImgUrl);
+    setpostShowUrl(post.postShowUrl);
+    setpostid(post.postid);
+    seturl(post.url);
+    setComments(post.comments);
+    setOwnerShowUrl(post.ownerShowUrl);
+  }, [post]);
 
 
   // const [urls, setUrls] = useState([]);
@@ -169,22 +169,45 @@ export default function Post({ post }) {
 
   function handleLike() {
     const method = likes.lognameLikesThis ? "DELETE" : "POST";
-    console.log(likes)
-    fetch(likes.url, {
+    console.log(likes.url);
+    const likeUrl = method === "DELETE" ? likes.url : `/api/v1/likes/?postid=${postid}`; // Fallback for POST if `likes.url` is null
+  
+    // If it's a POST (like action), we need to provide postid to the backend
+    const requestOptions = {
       method: method,
       credentials: "same-origin",
-    })
+    };
+  
+    if (method === "POST") {
+      // Attach postid for POST request (when liking a post)
+      requestOptions.headers = {
+        "Content-Type": "application/json",
+      };
+      requestOptions.body = JSON.stringify({ postid: postid }); // Assuming `postid` is available in scope
+    }
+
+    console.log(likeUrl);
+    // Perform the fetch request
+    fetch(likeUrl, requestOptions)
       .then((response) => {
         if (response.ok) {
-          setLikes((prevLikes) => ({
-            ...prevLikes,
-            lognameLikesThis: !prevLikes.lognameLikesThis,
-            numLikes: !prevLikes.lognameLikesThis
-              ? prevLikes.numLikes + 1
-              : prevLikes.numLikes - 1,
-          }))
+          if (method === "POST" && response.likeid) {
+            setLikes((prevLikes) => ({
+              ...prevLikes,
+              lognameLikesThis: true,
+              numLikes: prevLikes.numLikes + 1,
+              url: `/api/v1/likes/${response.likeid}/`,
+            }));
+          } else if (method === "DELETE") {
+            setLikes((prevLikes) => ({
+              ...prevLikes,
+              lognameLikesThis: false,
+              numLikes: prevLikes.numLikes - 1,
+              url: null, // Reset the like URL after unliking
+            }));
+          }
         } else {
-          console.error("Failed to update like status")
+          console.error("Failed to update like status");
         }
       })
       .catch((error) => {
