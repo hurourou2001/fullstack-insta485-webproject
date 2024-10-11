@@ -8,33 +8,28 @@ export const useInfiniteScroll = (initialUrl) => {
     const [loading, setLoading] = useState(false);
     const [xx, setxx] = useState(true);
 
-    const fetchPostDetail = async (url) => {
-        if (!xx){
-            return;
-        }
-        try {
-            const response = await fetch(url,{
-                method: 'GET',
-                credentials: 'same-origin',
-            });
-            if(!response.ok) throw new Error('Failed to fetch post details');
-            const postData = await response.json();
-            return postData;
-        } catch (error) {
-            console.error('Error fetching post details ', error);
-            return null;
-        }
-    };
+    // const fetchPostDetail = async (url) => {
+    //     try {
+    //         const response = await fetch(url,{
+    //             method: 'GET',
+    //             credentials: 'same-origin',
+    //         });
+    //         if(!response.ok) throw new Error('Failed to fetch post details');
+    //         const postData = await response.json();
+    //         return postData;
+    //     } catch (error) {
+    //         console.error('Error fetching post details ', error);
+    //         return null;
+    //     }
+    // };
 
     const fetchItems = async () => {
-        if (!nextUrl || loading) return;
-        if (!xx){
-            return;
-        }
-        
+        if (!nextUrl || loading || !xx) return;
+
         setLoading(true);
         console.log(nextUrl)
-        // try {
+        //try {
+
         //     const response = await fetch(nextUrl, {
         //         method: 'GET',
         //         credentials: 'same-origin',
@@ -49,31 +44,26 @@ export const useInfiniteScroll = (initialUrl) => {
         //     // Filter out any null results (failed fetches)
         //     const validPosts = postDetails.filter((post) => post !== null);
         //     console.log(validPosts)
-        //     // setItems((prevItems) => [...prevItems, ...validPosts]);
-        //     setItems([...items], [...data.results])
+        //     setItems((prevItems) => [...prevItems, ...validPosts]);
         //     setNextUrl(posts.next || null);
         //     setHasMore(!!posts.next); //if there is no next URL, stop loading more
         //     setLoading(false);
-        //     setxx(false);
         // }  catch(error) {
         //     console.error('Error fetching items: ', error);
         //     setLoading(false);
-        // }
-        fetch(nextUrl, {  method: 'GET',
-            credentials: 'same-origin' })
+        fetch(nextUrl, { method: 'GET',
+            credentials: 'same-origin'
+        })
         .then((response) => {
             if (!response.ok) throw Error(response.statusText);
             return response.json();
         })
         .then((data) => {
-            // If ignoreStaleRequest was set to true, we want to ignore the results of the
-            // the request. Otherwise, update the state to trigger a new render.
             console.log(data.results);
-            // const postDetails = data.results.map((post) => fetchPostDetail(post.url));
-            setItems([...items, ...data.results]);
+            setItems((prevItems) => [...prevItems, ...data.results]);
             console.log(items);
-            setNextUrl(data.next);
-            setHasMore(!!data.next); //if there is no next URL, stop loading more
+            setNextUrl(data.next || null);
+            setHasMore(!!data.next);
             setLoading(false);
             setxx(false);
         })
@@ -82,6 +72,6 @@ export const useInfiniteScroll = (initialUrl) => {
 
     useEffect(() => {
         fetchItems();
-    }, [nextUrl]);
+    }, []);
     return { items, fetchItems, hasMore, loading};
 };
