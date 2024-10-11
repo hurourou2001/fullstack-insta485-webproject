@@ -29,6 +29,7 @@ export const useInfiniteScroll = (initialUrl) => {
         setLoading(true);
         console.log(nextUrl)
         //try {
+
         //     const response = await fetch(nextUrl, {
         //         method: 'GET',
         //         credentials: 'same-origin',

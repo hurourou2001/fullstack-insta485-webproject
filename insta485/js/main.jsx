@@ -34,7 +34,7 @@ export default function Main() {
                 endMessage={<p>No more posts to show</p>}
             >
                 {posts.map((post) => (
-                    <Post key={post.postid} post={post} />
+                    <Post key={post.postid} post={post.url} />
                 ))}
             </InfiniteScroll>
         </div>
