@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Comment from "./comment";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
 
 // The parameter of this function is an object with a string called url inside it.
 // url is a prop for the Post component.
@@ -35,6 +38,7 @@ export default function Post({ posturl }) {
   const [url, seturl] = useState("");
   const [ownerShowUrl, setOwnerShowUrl] = useState(""); 
   const [newCommentText, setNewCommentText] = useState("");
+  const [postLoad, setpostLoad] = useState(false);
 
 useEffect(() => {
     // Declare a boolean flag that we can use to cancel the API request.
@@ -70,6 +74,7 @@ useEffect(() => {
                 seturl(data.url);
                 setComments(data.comments);
                 setOwnerShowUrl(data.ownerShowUrl);
+                setpostLoad(true);
               }
             })
             .catch((error) => console.log(error));
@@ -318,8 +323,10 @@ useEffect(() => {
         <img src={ownerImgUrl} alt="owner_image" />
        </a>
       <a href = {ownerShowUrl}>{owner}</a>
-      <p>{created}</p> 
-      {/* change format and add link 🔼  TODO: add human readable time stamp*/} 
+      <a href = {postShowUrl}>
+        <p>{created}</p> 
+        {/* change format and add link 🔼  TODO: add human readable time stamp*/} 
+      </a>
       
       <img 
         src={imgUrl} 
@@ -327,6 +334,7 @@ useEffect(() => {
         onDoubleClick={handleDoubleClickLike} 
       />
       {/* Like Section */}
+      
       <div>
         <button data-testid='like-unlike-button' onClick={handleLike}>
           {likes.lognameLikesThis? "Unlike" : "Like"} ({likes.numLikes})
