@@ -15,7 +15,7 @@ export default function Post({ posturl }) {
   //     .catch((error) => console.error("Error fetching post: ", error));
   // }, [posturl]);
 
-  if (!post) {
+  if (!posturl) {
     return <div>Loading...</div>; // Display a loading message until the post is fetched
   }
 
