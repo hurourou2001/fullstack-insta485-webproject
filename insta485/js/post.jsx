@@ -15,7 +15,7 @@ export default function Post({ posturl }) {
   //     .catch((error) => console.error("Error fetching post: ", error));
   // }, [posturl]);
 
-  if (!post) {
+  if (!posturl) {
     return <div>Loading...</div>; // Display a loading message until the post is fetched
   }
 
@@ -50,31 +50,31 @@ useEffect(() => {
         console.log(data);
         // If ignoreStaleRequest was set to true, we want to ignore the results of the
         // the request. Otherwise, update the state to trigger a new render.
-        data.results.forEach(post => {
-          fetch(post.url, {credentials: 'same-origin'})
-            .then((response) => {
-              if (!response.ok) throw Error(response.statusText);
-              return response.json();
-            })
-            .then((postData) => {
-              console.log(postData);
+        // data.results.forEach(post => {
+        //   fetch(post.url, {credentials: 'same-origin'})
+        //     .then((response) => {
+        //       if (!response.ok) throw Error(response.statusText);
+        //       return response.json();
+        //     })
+        //     .then((postData) => {
+        //       console.log(postData);
               if (!ignoreStaleRequest) {
-                setImgUrl(postData.imgUrl);
-                setOwner(postData.owner);
-                setcomments_url(postData.comments_url);
-                setcreated(postData.created);
-                setLikes(postData.likes);
-                setownerImgUrl(postData.ownerImgUrl);
-                setpostShowUrl(postData.postShowUrl);
-                setpostid(postData.postid);
-                seturl(postData.url);
-                setComments(postData.comments);
-                setOwnerShowUrl(postData.ownerShowUrl);
+                setImgUrl(data.imgUrl);
+                setOwner(data.owner);
+                setcomments_url(data.comments_url);
+                setcreated(data.created);
+                setLikes(data.likes);
+                setownerImgUrl(data.ownerImgUrl);
+                setpostShowUrl(data.postShowUrl);
+                setpostid(data.postid);
+                seturl(data.url);
+                setComments(data.comments);
+                setOwnerShowUrl(data.ownerShowUrl);
               }
             })
             .catch((error) => console.log(error));
-        });
-      });
+        // });
+      // });
     return () => {
       // This is a cleanup function that runs whenever the Post component
       // unmounts or re-renders. If a Post is about to unmount or re-render, we
@@ -82,6 +82,7 @@ useEffect(() => {
       ignoreStaleRequest = true;
     };
   }, [posturl]);
+
 
 
   // const [urls, setUrls] = useState([]);
@@ -360,7 +361,7 @@ useEffect(() => {
 }
 
 Post.propTypes = {
-  post: PropTypes.object.isRequired,
+  posturl: PropTypes.string.isRequired,
   // imgurl: PropTypes.string.isRequired,
   // owner: PropTypes.string.isRequired,
   // comments: PropTypes.array.isRequired,
