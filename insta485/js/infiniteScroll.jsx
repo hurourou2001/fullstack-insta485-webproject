@@ -9,6 +9,9 @@ export const useInfiniteScroll = (initialUrl) => {
     const [xx, setxx] = useState(true);
 
     const fetchPostDetail = async (url) => {
+        if (!xx){
+            return;
+        }
         try {
             const response = await fetch(url,{
                 method: 'GET',
