@@ -319,51 +319,61 @@ useEffect(() => {
 
   return (
     <div className="post">
-       <a href = {ownerShowUrl}>
-        <img src={ownerImgUrl} alt="owner_image" />
-       </a>
-      <a href = {ownerShowUrl}>{owner}</a>
-      <a href = {postShowUrl}>
-        <p>{created}</p> 
-        {/* change format and add link 🔼  TODO: add human readable time stamp*/} 
-      </a>
-      
-      <img 
-        src={imgUrl} 
-        alt="post_image"
-        onDoubleClick={handleDoubleClickLike} 
-      />
-      {/* Like Section */}
-      
-      <div>
-        <button data-testid='like-unlike-button' onClick={handleLike}>
-          {likes.lognameLikesThis? "Unlike" : "Like"} ({likes.numLikes})
-        </button>
-      </div>
+      {postLoad ? (
+        <>
+          <a href={ownerShowUrl}>
+            <img src={ownerImgUrl} alt="owner_image" />
+          </a>
+          <a href={ownerShowUrl}>{owner}</a>
+          <a href={postShowUrl}>
+            <p>{created}</p>
+            {/* TODO: Add human readable timestamp */}
+          </a>
+  
+          <img
+            src={imgUrl}
+            alt="post_image"
+            onDoubleClick={handleDoubleClickLike}
+          />
+  
+          {/* Like Section */}
+          <div>
+            <button data-testid="like-unlike-button" onClick={handleLike}>
+              {likes.lognameLikesThis ? "Unlike" : "Like"} ({likes.numLikes})
+            </button>
+          </div>
 
-      {comments.map((x) =>
-          <Comment
-          key={x.commentid}
-          commentid={x.commentid}
-          lognameOwnsThis={x.lognameOwnsThis}
-          owner={x.owner}
-          ownerShowUrl={x.ownerShowUrl}
-          text={x.text}
-          url={x.url}
-          handleClick={handleClick}
-        />
+          <div>
+           {likes.numLikes === 1 ? "1 like" : `${likes.numLikes} likes`}
+          </div>
+  
+          {/* Comments Section */}
+          {comments.map((x) => (
+            <Comment
+              key={x.commentid}
+              commentid={x.commentid}
+              lognameOwnsThis={x.lognameOwnsThis}
+              owner={x.owner}
+              ownerShowUrl={x.ownerShowUrl}
+              text={x.text}
+              url={x.url}
+              handleClick={handleClick}
+            />
+          ))}
+  
+          {/* Comment Form */}
+          <form data-testid="comment-form" onSubmit={handleAddComment}>
+            <input
+              type="text"
+              onChange={(e) => setNewCommentText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Add a comment..."
+            />
+          </form>
+        </>
+      ) : (
+        <p>Loading...</p>  // This will render when postLoad is false
       )}
-
-      {/* Comment Form */}
-      <form data-testid='comment-form' onSubmit={handleAddComment}>
-        <input
-          type="text"
-          //value={newCommentText}
-          onChange={(e) => setNewCommentText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Add a comment..."
-        />
-      </form>
     </div>
   );
 }

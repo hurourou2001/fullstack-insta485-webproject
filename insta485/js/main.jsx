@@ -32,6 +32,7 @@ export default function Main() {
                 hasMore={hasMore}
                 loader={<h4>Loading more posts...</h4>}
                 endMessage={<p>No more posts to show</p>}
+                
             >
                 {posts.map((post) => (
                     <Post key={post.postid} posturl={post.url} />

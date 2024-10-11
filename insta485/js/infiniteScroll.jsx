@@ -24,7 +24,9 @@ export const useInfiniteScroll = (initialUrl) => {
     // };
 
     const fetchItems = async () => {
+        console.log('try fetching items')
         if (!nextUrl || loading || !xx) return;
+        console.log('fetching items')
 
         setLoading(true);
         console.log(nextUrl)
@@ -72,6 +74,7 @@ export const useInfiniteScroll = (initialUrl) => {
 
     useEffect(() => {
         fetchItems();
+        setxx(true);
     }, [nextUrl]);
     return { items, fetchItems, hasMore, loading};
 };
