@@ -215,62 +215,66 @@ useEffect(() => {
       requestOptions.headers = {
         "Content-Type": "application/json",
       };
-       // Assuming `postid` is available in scope
+      requestOptions.body = JSON.stringify({ postid: postid });// Assuming `postid` is available in scope
     }
 
     console.log(likeUrl);
     // Perform the fetch request
     fetch(likeUrl, requestOptions)
       .then((response) => {
-        if (response.ok) {
-          if (method === "POST") {
-            response = response.json();
-            //console.log(prevLikes);
-            console.log(response.json());
-            setLikes((prevLikes) => ({
-              ...prevLikes,
-              lognameLikesThis: true,
-              numLikes: prevLikes.numLikes + 1,
-              url: `/api/v1/likes/${response.likeid}/`,
-            }));
+          // Parse the response body as JSON
+        return method === "POST" ? response.json() : Promise.resolve(); // Parsing the response JSON
+      })
+      .then((data) => {
+        // Now we have the parsed JSON in the 'data' object
+        if (method === "POST") {
+          console.log(data); // Check what is returned from the server (likeid, url, etc.)
+          setLikes((prevLikes) => ({
+            ...prevLikes,
+            lognameLikesThis: true,
+            numLikes: prevLikes.numLikes + 1,
+            url: `/api/v1/likes/${data.likeid}/`, // Set the new like URL using data.likeid
+          }));
+        } else if (method === "DELETE") {
+          setLikes((prevLikes) => ({
+            ...prevLikes,
+            lognameLikesThis: false,
+            numLikes: prevLikes.numLikes - 1,
+            url: null, // Reset the like URL after unliking
+          }));
 
-          } else if (method === "DELETE") {
-            setLikes((prevLikes) => ({
-              ...prevLikes,
-              lognameLikesThis: false,
-              numLikes: prevLikes.numLikes - 1,
-              url: null, // Reset the like URL after unliking
-            }));
-          }
-        } else {
-          console.error("Failed to update like status");
         }
       })
+      //   } else {
+      //     console.error("Failed to update like status");
+      //   }
+      // })
       .catch((error) => {
         console.error("There was an error updating the like status:", error);
       });
   }
 
   function handleDoubleClickLike() {
+    const likesUrl = `/api/v1/likes/?postid=${postid}`
     if (!likes.lognameLikesThis) {
-      fetch(likes.url, {
+      fetch(likesUrl, {
         method: "POST",
         credentials: "same-origin",
       })
-        .then((response) => {
-          if(response.ok) {
-            setLikes((prevLikes) => ({
-              ...prevLikes,
-              lognameLikesThis: true,
-              numLikes: prevLikes.numLikes + 1,
-            }));
-          } else {
-            console.error("Failed to like the image");
-          }
-        })
-        .catch((error) => {
-          console.error("There was an error liking the image:", error);
-        });
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setLikes((prevLikes) => ({
+          ...prevLikes,
+          lognameLikesThis: true,
+          numLikes: prevLikes.numLikes + 1,
+          url: `/api/v1/likes/${data.likeid}/`,
+        }));
+      })
+      .catch((error) => {
+        console.error("There was an error liking the image:", error);
+      });
     }
   }
 
