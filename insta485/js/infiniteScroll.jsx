@@ -7,22 +7,7 @@ export const useInfiniteScroll = (initialUrl) => {
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
     const [xx, setxx] = useState(true);
-
-    // const fetchPostDetail = async (url) => {
-    //     try {
-    //         const response = await fetch(url,{
-    //             method: 'GET',
-    //             credentials: 'same-origin',
-    //         });
-    //         if(!response.ok) throw new Error('Failed to fetch post details');
-    //         const postData = await response.json();
-    //         return postData;
-    //     } catch (error) {
-    //         console.error('Error fetching post details ', error);
-    //         return null;
-    //     }
-    // };
-
+    
     const fetchItems = async () => {
         console.log('try fetching items')
         if (!nextUrl || loading || !xx) return;
