@@ -72,6 +72,6 @@ export const useInfiniteScroll = (initialUrl) => {
 
     useEffect(() => {
         fetchItems();
-    }, []);
+    }, [nextUrl]);
     return { items, fetchItems, hasMore, loading};
 };
