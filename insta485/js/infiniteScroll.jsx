@@ -24,8 +24,7 @@ export const useInfiniteScroll = (initialUrl) => {
     // };
 
     const fetchItems = async () => {
-        if (!nextUrl || loading) return;
-        if (!xx) return;
+        if (!nextUrl || loading || !xx) return;
 
         setLoading(true);
         console.log(nextUrl)
@@ -51,7 +50,7 @@ export const useInfiniteScroll = (initialUrl) => {
         // }  catch(error) {
         //     console.error('Error fetching items: ', error);
         //     setLoading(false);
-        fecth(nextUrl, { method: 'GET',
+        fetch(nextUrl, { method: 'GET',
             credentials: 'same-origin'
         })
         .then((response) => {
@@ -60,9 +59,9 @@ export const useInfiniteScroll = (initialUrl) => {
         })
         .then((data) => {
             console.log(data.results);
-            setItems([...items, ...data.results]);
+            setItems((prevItems) => [...prevItems, ...data.results]);
             console.log(items);
-            setNextUrl(data.next);
+            setNextUrl(data.next || null);
             setHasMore(!!data.next);
             setLoading(false);
             setxx(false);
@@ -72,6 +71,6 @@ export const useInfiniteScroll = (initialUrl) => {
 
     useEffect(() => {
         fetchItems();
-    }, [nextUrl]);
+    }, []);
     return { items, fetchItems, hasMore, loading};
 };
