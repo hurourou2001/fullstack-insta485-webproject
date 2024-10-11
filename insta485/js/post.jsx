@@ -221,25 +221,26 @@ export default function Post({ post }) {
   }
 
   function handleDoubleClickLike() {
+    const likesUrl = `/api/v1/likes/?postid=${postid}`
     if (!likes.lognameLikesThis) {
-      fetch(likes.url, {
+      fetch(likesUrl, {
         method: "POST",
         credentials: "same-origin",
       })
-        .then((response) => {
-          if(response.ok) {
-            setLikes((prevLikes) => ({
-              ...prevLikes,
-              lognameLikesThis: true,
-              numLikes: prevLikes.numLikes + 1,
-            }));
-          } else {
-            console.error("Failed to like the image");
-          }
-        })
-        .catch((error) => {
-          console.error("There was an error liking the image:", error);
-        });
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setLikes((prevLikes) => ({
+          ...prevLikes,
+          lognameLikesThis: true,
+          numLikes: prevLikes.numLikes + 1,
+          url: `/api/v1/likes/${data.likeid}/`,
+        }));
+      })
+      .catch((error) => {
+        console.error("There was an error liking the image:", error);
+      });
     }
   }
 
