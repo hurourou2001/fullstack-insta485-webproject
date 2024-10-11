@@ -4,7 +4,7 @@ import Comment from "./comment";
 
 // The parameter of this function is an object with a string called url inside it.
 // url is a prop for the Post component.
-export default function Post({ post }) {
+export default function Post({ posturl }) {
   /* Display image and post owner of a single post */
   // const [post, setPost] = useState(null);
 
@@ -15,7 +15,7 @@ export default function Post({ post }) {
   //     .catch((error) => console.error("Error fetching post: ", error));
   // }, [posturl]);
 
-  if (!post) {
+  if (!posturl) {
     return <div>Loading...</div>; // Display a loading message until the post is fetched
   }
 
@@ -36,19 +36,52 @@ export default function Post({ post }) {
   const [ownerShowUrl, setOwnerShowUrl] = useState(""); 
   const [newCommentText, setNewCommentText] = useState("");
 
-  useEffect(() => {
-    setImgUrl(post.imgUrl);
-    setOwner(post.owner);
-    setcomments_url(post.comments_url);
-    setcreated(post.created);
-    setLikes(post.likes);
-    setownerImgUrl(post.ownerImgUrl);
-    setpostShowUrl(post.postShowUrl);
-    setpostid(post.postid);
-    seturl(post.url);
-    setComments(post.comments);
-    setOwnerShowUrl(post.ownerShowUrl);
-  }, [post]);
+useEffect(() => {
+    // Declare a boolean flag that we can use to cancel the API request.
+    let ignoreStaleRequest = false;
+
+    // Call REST API to get the post's information
+    fetch(posturl, { credentials: "same-origin" })
+      .then((response) => {
+        if (!response.ok) throw Error(response.statusText);
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        // If ignoreStaleRequest was set to true, we want to ignore the results of the
+        // the request. Otherwise, update the state to trigger a new render.
+        data.results.forEach(post => {
+          fetch(post.url, {credentials: 'same-origin'})
+            .then((response) => {
+              if (!response.ok) throw Error(response.statusText);
+              return response.json();
+            })
+            .then((postData) => {
+              console.log(postData);
+              if (!ignoreStaleRequest) {
+                setImgUrl(postData.imgUrl);
+                setOwner(postData.owner);
+                setcomments_url(postData.comments_url);
+                setcreated(postData.created);
+                setLikes(postData.likes);
+                setownerImgUrl(postData.ownerImgUrl);
+                setpostShowUrl(postData.postShowUrl);
+                setpostid(postData.postid);
+                seturl(postData.url);
+                setComments(postData.comments);
+                setOwnerShowUrl(postData.ownerShowUrl);
+              }
+            })
+            .catch((error) => console.log(error));
+        });
+      });
+    return () => {
+      // This is a cleanup function that runs whenever the Post component
+      // unmounts or re-renders. If a Post is about to unmount or re-render, we
+      // should avoid updating state.
+      ignoreStaleRequest = true;
+    };
+  }, [posturl]);
 
 
   // const [urls, setUrls] = useState([]);
@@ -209,6 +242,7 @@ export default function Post({ post }) {
             numLikes: prevLikes.numLikes - 1,
             url: null, // Reset the like URL after unliking
           }));
+
         }
       })
       //   } else {
