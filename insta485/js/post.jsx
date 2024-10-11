@@ -182,35 +182,39 @@ export default function Post({ post }) {
       requestOptions.headers = {
         "Content-Type": "application/json",
       };
-       // Assuming `postid` is available in scope
+      requestOptions.body = JSON.stringify({ postid: postid });// Assuming `postid` is available in scope
     }
 
     console.log(likeUrl);
     // Perform the fetch request
     fetch(likeUrl, requestOptions)
       .then((response) => {
-        if (response.ok) {
-          if (method === "POST") {
-            //console.log(prevLikes);
-            // console.log(response.json());
-            setLikes((prevLikes) => ({
-              ...prevLikes,
-              lognameLikesThis: true,
-              numLikes: prevLikes.numLikes + 1,
-              url: `/api/v1/likes/${response.likeid}/`,
-            }));
-          } else if (method === "DELETE") {
-            setLikes((prevLikes) => ({
-              ...prevLikes,
-              lognameLikesThis: false,
-              numLikes: prevLikes.numLikes - 1,
-              url: null, // Reset the like URL after unliking
-            }));
-          }
-        } else {
-          console.error("Failed to update like status");
+          // Parse the response body as JSON
+        return method === "POST" ? response.json() : Promise.resolve(); // Parsing the response JSON
+      })
+      .then((data) => {
+        // Now we have the parsed JSON in the 'data' object
+        if (method === "POST") {
+          console.log(data); // Check what is returned from the server (likeid, url, etc.)
+          setLikes((prevLikes) => ({
+            ...prevLikes,
+            lognameLikesThis: true,
+            numLikes: prevLikes.numLikes + 1,
+            url: `/api/v1/likes/${data.likeid}/`, // Set the new like URL using data.likeid
+          }));
+        } else if (method === "DELETE") {
+          setLikes((prevLikes) => ({
+            ...prevLikes,
+            lognameLikesThis: false,
+            numLikes: prevLikes.numLikes - 1,
+            url: null, // Reset the like URL after unliking
+          }));
         }
       })
+      //   } else {
+      //     console.error("Failed to update like status");
+      //   }
+      // })
       .catch((error) => {
         console.error("There was an error updating the like status:", error);
       });
