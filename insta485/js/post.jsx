@@ -15,16 +15,7 @@ dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
 export default function Post({ posturl }) {
-<<<<<<< HEAD
-  /* Display image and post owner of a single post */
-
-  if (!posturl) {
-    return <div>Loading...</div>; // Display a loading message until the post is fetched
-  }
-
-=======
   // Declare state variables outside of conditional blocks
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
   const [imgUrl, setImgUrl] = useState("");
   const [owner, setOwner] = useState("");
   const [comments, setComments] = useState([]);
@@ -40,43 +31,11 @@ export default function Post({ posturl }) {
   const [postid, setPostid] = useState(0);
   const [ownerShowUrl, setOwnerShowUrl] = useState("");
   const [newCommentText, setNewCommentText] = useState("");
-<<<<<<< HEAD
-  const [postLoad, setpostLoad] = useState(false);
-=======
   const [postLoad, setPostLoad] = useState(false);
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
 
   useEffect(() => {
     let ignoreStaleRequest = false;
 
-<<<<<<< HEAD
-    // Call REST API to get the post's information
-    fetch(posturl, { credentials: "same-origin" })
-      .then((response) => {
-        if (!response.ok) throw Error(response.statusText);
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-
-              if (!ignoreStaleRequest) {
-                setImgUrl(data.imgUrl);
-                setOwner(data.owner);
-                setcomments_url(data.comments_url);
-                setcreated(data.created);
-                setLikes(data.likes);
-                setownerImgUrl(data.ownerImgUrl);
-                setpostShowUrl(data.postShowUrl);
-                setpostid(data.postid);
-                seturl(data.url);
-                setComments(data.comments);
-                setOwnerShowUrl(data.ownerShowUrl);
-                setpostLoad(true);
-              }
-            })
-            .catch((error) => console.log(error));
-
-=======
     if (posturl) {
       // Call REST API to get the post's information
       fetch(posturl, { credentials: "same-origin" })
@@ -101,29 +60,11 @@ export default function Post({ posturl }) {
         })
         .catch((error) => console.log(error));
     }
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
     return () => {
       ignoreStaleRequest = true;
     };
   }, [posturl]);
 
-<<<<<<< HEAD
-  function handleClick(commentid){
-    const url = `/api/v1/comments/${commentid}/`
-    fetch(url, {method: "DELETE", credentials: "same-origin"})
-    .then(response => {
-      if(response.ok){
-        console.log("Comment deleted successfully");
-        setComments(comments.filter((x) => x.commentid !== commentid));
-      }
-      else{
-        console.log("Error deleting comment");
-      }
-    })
-    .catch(error => {
-      console.log("there is an error in delete comment", error);
-    });
-=======
   function handleClick(commentid) {
     const deleteUrl = `/api/v1/comments/${commentid}/`;
     fetch(deleteUrl, { method: "DELETE", credentials: "same-origin" })
@@ -137,7 +78,6 @@ export default function Post({ posturl }) {
       .catch((error) => {
         console.log("There is an error in deleting the comment", error);
       });
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
   }
 
   function handleLike() {
@@ -178,10 +118,6 @@ export default function Post({ posturl }) {
           }));
         }
       })
-<<<<<<< HEAD
-
-=======
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
       .catch((error) => {
         console.error("There was an error updating the like status:", error);
       });
@@ -251,30 +187,6 @@ export default function Post({ posturl }) {
           </a>
           <a href={ownerShowUrl}>{owner}</a>
           <a href={postShowUrl}>
-<<<<<<< HEAD
-          <p>{dayjs.utc(created).local().fromNow()}</p>
-            {/* TODO: Add human readable timestamp */}
-          </a>
-  
-          <img
-            src={imgUrl}
-            alt="post_image"
-            onDoubleClick={handleDoubleClickLike}
-          />
-  
-          {/* Like Section */}
-          <div>
-            <button data-testid="like-unlike-button" onClick={handleLike}>
-              {likes.lognameLikesThis ? "Unlike" : "Like"} ({likes.numLikes})
-            </button>
-          </div>
-
-          <div>
-           {likes.numLikes === 1 ? "1 like" : `${likes.numLikes} likes`}
-          </div>
-  
-          {/* Comments Section */}
-=======
             <p>{dayjs.utc(created).local().fromNow()}</p>
           </a>
 
@@ -298,7 +210,6 @@ export default function Post({ posturl }) {
             {likes.numLikes === 1 ? "1 like" : `${likes.numLikes} likes`}
           </div>
 
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
           {comments.map((x) => (
             <Comment
               key={x.commentid}
@@ -308,16 +219,6 @@ export default function Post({ posturl }) {
               ownerShowUrl={x.ownerShowUrl}
               text={x.text}
               url={x.url}
-<<<<<<< HEAD
-              handleClick={handleClick}
-            />
-          ))}
-  
-          {/* Comment Form */}
-          <form data-testid="comment-form" onSubmit={handleAddComment}>
-            <input
-              type="text"
-=======
               handleClick={() => handleClick(x.commentid)}
             />
           ))}
@@ -326,7 +227,6 @@ export default function Post({ posturl }) {
             <input
               type="text"
               value={newCommentText}
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
               onChange={(e) => setNewCommentText(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Add a comment..."
@@ -334,11 +234,7 @@ export default function Post({ posturl }) {
           </form>
         </>
       ) : (
-<<<<<<< HEAD
-        <p>Loading...</p>  // This will render when postLoad is false
-=======
         <p>Loading...</p>
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
       )}
     </div>
   );
@@ -347,7 +243,3 @@ export default function Post({ posturl }) {
 Post.propTypes = {
   posturl: PropTypes.string.isRequired,
 };
-<<<<<<< HEAD
-
-=======
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
