@@ -1,24 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
 
-<<<<<<< HEAD
-export default function Comment({ commentid, lognameOwnsThis, owner, ownerShowUrl, text, url, handleClick }) {
-    return(
-        <div className="comment">
-            <a href={ownerShowUrl}>
-                {owner}
-            </a> 
-            <span data-testid ="comment-text"> {text} </span>
-            {lognameOwnsThis && (
-                <button 
-                data-testid="delete-comment-button"
-                onClick={() => handleClick(commentid)}>
-                Delete
-                </button>
-            )}
-        </div>
-    );
-=======
 export default function Comment({
   commentid,
   lognameOwnsThis,
@@ -42,7 +24,6 @@ export default function Comment({
       )}
     </div>
   );
->>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
 }
 
 Comment.propTypes = {
