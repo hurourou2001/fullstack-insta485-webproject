@@ -1,26 +1,36 @@
+"""REST API for managing likes."""
+
 import flask
 import insta485
-from insta485.views.accounts import hash_password
+
 
 @insta485.app.route('/api/v1/likes/', methods=["POST"])
 def create_like():
+    """Create a new like for a post."""
     connection = insta485.model.get_db()
+
     if not insta485.api.posts.is_authenticated(connection):
-        return flask.jsonify({"message": "Unauthorized", "status_code": 403}),403
-    
-    #postid = flask.request.args.get('postid', type=int)
+        return flask.jsonify({
+            "message": "Unauthorized",
+            "status_code": 403
+        }), 403
+
     url = flask.request.path
+
     username = ""
     if "username" in flask.session:
         username = flask.session["username"]
     else:
         username = flask.request.authorization.username
+
     postid = flask.request.args.get('postid', type=int)
-    # if postid is None:
-    #     postid = flask.request.json.get('postid', type=int)
     if postid is None:
-        return flask.jsonify({"message": "no postid", "status_code": 400}), 400
-    
+        return flask.jsonify({
+            "message": "no postid",
+            "status_code": 400
+        }), 400
+
+    # Check if the like already exists
     check_exist_like = """
         SELECT likeid
         FROM likes
@@ -28,20 +38,21 @@ def create_like():
     """
     cur = connection.execute(check_exist_like, (postid, username))
     rst = cur.fetchone()
-    print('aaaaaa')
+
     if rst is not None:
-        return flask.jsonify({"likeid": rst["likeid"],
-                              "url": f"{url}{rst['likeid']}/"}), 200
-    
+        return flask.jsonify({
+            "likeid": rst["likeid"],
+            "url": f"{url}{rst['likeid']}/"
+        }), 200
+
+    # Add new like
     add_like = """
         INSERT INTO likes (owner, postid)
         VALUES (?, ?)
     """
     cur = connection.execute(add_like, (username, postid))
     likeid = cur.lastrowid
-    print(likeid)
 
-    print('bbbbbb')
     return flask.jsonify({
         "likeid": likeid,
         "url": f"{url}{likeid}/"
@@ -50,37 +61,44 @@ def create_like():
 
 @insta485.app.route('/api/v1/likes/<int:likeid>/', methods=["DELETE"])
 def delete_like(likeid):
+    """Delete a like by likeid."""
     connection = insta485.model.get_db()
+
     if not insta485.api.posts.is_authenticated(connection):
-        return flask.jsonify({"message": "Unauthorized", "status_code": 403}),403
-    
+        return flask.jsonify({
+            "message": "Unauthorized",
+            "status_code": 403
+        }), 403
+
     if "username" in flask.session:
         user = flask.session["username"]
     else:
         user = flask.request.authorization.get("username")
+
+    # Check if the like exists
     check_q = """
         SELECT likeid, owner
         FROM likes
         WHERE likeid = ?
     """
-
     rst = connection.execute(check_q, (likeid,)).fetchone()
+
     if rst is None:
         return flask.jsonify({
-                            "message": "Like not found",
-                            "status_code": 404
-                            }), 404
+            "message": "Like not found",
+            "status_code": 404
+        }), 404
 
     if rst["owner"] != user:
         return flask.jsonify({
-                            "message": "Forbidden",
-                            "status_code": 403
-                            }), 403
-    
+            "message": "Forbidden",
+            "status_code": 403
+        }), 403
+
+    # Delete the like
     delete_q = """
         DELETE FROM likes
         WHERE likeid = ?
     """
     connection.execute(delete_q, (likeid,))
     return "", 204
-

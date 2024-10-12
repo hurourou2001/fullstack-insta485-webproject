@@ -1,8 +1,8 @@
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import Post from "./post";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useInfiniteScroll } from './infiniteScroll';
+import Post from "./post";
+import useInfiniteScroll from "./infiniteScroll";
 
 // Create a root
 const root = createRoot(document.getElementById("reactEntry"));
@@ -11,6 +11,7 @@ const root = createRoot(document.getElementById("reactEntry"));
 // Insert the post component into the DOM
 root.render(
     <Main />
+<<<<<<< HEAD
 );
 
 export default function Main() {
@@ -36,6 +37,38 @@ export default function Main() {
                     <Post key={post.postid} posturl={post.url} />
                 ))}
             </InfiniteScroll>
+=======
+  </StrictMode>,
+);
+
+export default function Main() {
+  const {
+    items: posts,
+    fetchItems: fetchPosts,
+    hasMore,
+    loading,
+  } = useInfiniteScroll("/api/v1/posts/");
+  console.log(posts);
+  return (
+    <div className="main-page">
+      {loading && posts.length === 0 && (
+        <div className="loading-placeholder">
+          <p>Loading posts...</p>
+>>>>>>> 77bf5e502602e4df37a59b75e85eadd89eda91b1
         </div>
-    );
+      )}
+
+      <InfiniteScroll
+        dataLength={posts.length}
+        next={fetchPosts}
+        hasMore={hasMore}
+        loader={<h4>Loading more posts...</h4>}
+        endMessage={<p>No more posts to show</p>}
+      >
+        {posts.map((post) => (
+          <Post key={post.postid} posturl={post.url} />
+        ))}
+      </InfiniteScroll>
+    </div>
+  );
 }
