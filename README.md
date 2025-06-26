@@ -20,7 +20,7 @@ This project is a simplified clone of Instagram, developed as part of the EECS 4
 - **Authentication**: Flask sessions and password hashing
 
 ## 📂 Project Structure
-insta485/
+'''insta485/
 ├── app/
 │ ├── init.py
 │ ├── views.py # Flask route handlers
@@ -32,4 +32,4 @@ insta485/
 ├── templates/ # Jinja2 HTML templates
 ├── config.py # App configuration
 ├── requirements.txt # Python dependencies
-└── run.py # App entry point
+└── run.py # App entry point'''
